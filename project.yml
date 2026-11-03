@@ -7,7 +7,7 @@ options:
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    MARKETING_VERSION: "0.1.0"
+    MARKETING_VERSION: "0.1.1"
     CURRENT_PROJECT_VERSION: "1"
 packages:
   PinCalCore:
@@ -25,6 +25,8 @@ targets:
       properties:
         CFBundleDisplayName: Pin-Cal
         CFBundleName: Pin-Cal
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSApplicationCategoryType: public.app-category.productivity
         NSCalendarsFullAccessUsageDescription: Pin-Cal reads your calendars to show when you are busy, so you can pick free slots to share. It only adds or removes events when you reserve or release slots.
         NSHumanReadableCopyright: MIT License
