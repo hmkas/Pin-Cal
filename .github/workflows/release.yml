@@ -10,12 +10,8 @@ permissions:
 jobs:
   build:
     runs-on: macos-26
-    env:
-      # Fine-grained token with "Contents: read and write" on hmkas/homebrew-tap.
-      # Without it the release still works; only the cask update is skipped.
-      TAP_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Test core
         run: swift test --package-path Packages/PinCalCore
       - name: Build app
@@ -25,15 +21,23 @@ jobs:
           xcodebuild -project PinCal.xcodeproj -scheme PinCal -configuration Release \
             -derivedDataPath build -destination 'platform=macOS' build
           ditto -c -k --keepParent build/Build/Products/Release/Pin-Cal.app Pin-Cal.zip
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           files: Pin-Cal.zip
       - name: Update Homebrew cask
-        if: env.TAP_TOKEN != ''
+        env:
+          # Fine-grained token with "Contents: read and write" on hmkas/homebrew-tap.
+          # Only this step sees it. Without it the release still works; the cask update is skipped.
+          TAP_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
         run: |
+          if [ -z "$TAP_TOKEN" ]; then echo "TAP_GITHUB_TOKEN not set; skipping cask update"; exit 0; fi
           VERSION="${GITHUB_REF_NAME#v}"
+          # The cask is Ruby that runs on users' Macs: only accept plain version numbers.
+          [[ "$VERSION" =~ ^[0-9]+(\.[0-9]+)*$ ]] || { echo "Refusing unexpected version '$VERSION'"; exit 1; }
           SHA=$(shasum -a 256 Pin-Cal.zip | awk '{print $1}')
-          git clone "https://x-access-token:${TAP_TOKEN}@github.com/hmkas/homebrew-tap.git" tap
+          # Pass the token as a header so it isn't stored in tap/.git/config.
+          AUTH="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$TAP_TOKEN" | base64)"
+          git -c http.extraheader="$AUTH" clone https://github.com/hmkas/homebrew-tap.git tap
           cd tap
           sed -i '' -E \
             -e "s/^  version \".*\"/  version \"${VERSION}\"/" \
@@ -42,4 +46,4 @@ jobs:
           git diff --stat
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "pin-cal ${VERSION}" && git push || echo "Cask already up to date"
+          git commit -am "pin-cal ${VERSION}" && git -c http.extraheader="$AUTH" push || echo "Cask already up to date"
