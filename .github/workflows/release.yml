@@ -10,6 +10,10 @@ permissions:
 jobs:
   build:
     runs-on: macos-26
+    env:
+      # Fine-grained token with "Contents: read and write" on hmkas/homebrew-tap.
+      # Without it the release still works; only the cask update is skipped.
+      TAP_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - name: Test core
@@ -24,3 +28,18 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           files: Pin-Cal.zip
+      - name: Update Homebrew cask
+        if: env.TAP_TOKEN != ''
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          SHA=$(shasum -a 256 Pin-Cal.zip | awk '{print $1}')
+          git clone "https://x-access-token:${TAP_TOKEN}@github.com/hmkas/homebrew-tap.git" tap
+          cd tap
+          sed -i '' -E \
+            -e "s/^  version \".*\"/  version \"${VERSION}\"/" \
+            -e "s/^  sha256 \".*\"/  sha256 \"${SHA}\"/" \
+            Casks/pin-cal.rb
+          git diff --stat
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "pin-cal ${VERSION}" && git push || echo "Cask already up to date"

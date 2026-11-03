@@ -61,6 +61,14 @@ macOS 26 (Tahoe) or later.
 
 ## Install
 
+### With Homebrew
+
+```sh
+brew install --cask hmkas/tap/pin-cal
+```
+
+This installs the latest release and clears the quarantine flag, so macOS doesn't block it.
+
 ### From a release
 
 Download `Pin-Cal.zip` from [Releases](../../releases), unzip it and move `Pin-Cal.app` to `/Applications`.
