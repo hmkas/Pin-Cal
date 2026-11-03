@@ -65,11 +65,19 @@ macOS 26 (Tahoe) or later.
 
 Download `Pin-Cal.zip` from [Releases](../../releases), unzip it and move `Pin-Cal.app` to `/Applications`.
 
-The app is not notarized, so macOS blocks the first launch. Either right-click → **Open**, or run:
+The app is not notarized, so macOS blocks the first launch. To allow it once:
+
+1. Open Pin-Cal and dismiss the warning.
+2. Go to **System Settings → Privacy & Security**, scroll down and click **Open Anyway** next to the Pin-Cal message.
+3. Confirm with your password or Touch ID. From then on it opens normally.
+
+Or remove the quarantine flag in Terminal:
 
 ```sh
 xattr -dr com.apple.quarantine /Applications/Pin-Cal.app
 ```
+
+Apps you build from source yourself (see below) are never blocked.
 
 ### From source
 
