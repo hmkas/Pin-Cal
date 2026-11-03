@@ -1,0 +1,26 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test core
+        run: swift test --package-path Packages/PinCalCore
+      - name: Build app
+        run: |
+          brew install xcodegen
+          xcodegen generate
+          xcodebuild -project PinCal.xcodeproj -scheme PinCal -configuration Release \
+            -derivedDataPath build -destination 'platform=macOS' build
+          ditto -c -k --keepParent build/Build/Products/Release/Pin-Cal.app Pin-Cal.zip
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: Pin-Cal.zip

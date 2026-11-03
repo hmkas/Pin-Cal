@@ -1,0 +1,54 @@
+name: PinCal
+options:
+  bundleIdPrefix: io.github.pincal
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+packages:
+  PinCalCore:
+    path: Packages/PinCalCore
+targets:
+  PinCal:
+    type: application
+    platform: macOS
+    sources:
+      - PinCal
+    dependencies:
+      - package: PinCalCore
+    info:
+      path: PinCal/Info.plist
+      properties:
+        CFBundleDisplayName: Pin-Cal
+        CFBundleName: Pin-Cal
+        LSApplicationCategoryType: public.app-category.productivity
+        NSCalendarsFullAccessUsageDescription: Pin-Cal reads your calendars to show when you are busy, so you can pick free slots to share. It only adds or removes events when you reserve or release slots.
+        NSHumanReadableCopyright: MIT License
+    entitlements:
+      path: PinCal/PinCal.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.personal-information.calendars: true
+    settings:
+      base:
+        PRODUCT_NAME: Pin-Cal
+        PRODUCT_MODULE_NAME: PinCal
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.pincal.PinCal
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+        DEVELOPMENT_TEAM: ""
+        ENABLE_HARDENED_RUNTIME: YES
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+schemes:
+  PinCal:
+    build:
+      targets:
+        PinCal: all
+    run:
+      config: Debug
+    archive:
+      config: Release
