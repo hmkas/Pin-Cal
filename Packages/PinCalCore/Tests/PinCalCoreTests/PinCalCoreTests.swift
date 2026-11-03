@@ -151,7 +151,7 @@ func slot(_ d: Int, _ h1: Int, _ m1: Int, _ h2: Int, _ m2: Int, month: Int = 11,
         Ich bin zu folgenden Zeiten verfügbar:
         • Mittwoch, 4. November: 10:00–11:00, 14:00–15:30
         • Donnerstag, 5. November: 09:00–10:00
-        (Zeiten in CET)
+        (Zeiten in MEZ)
         """)
     }
 

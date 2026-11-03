@@ -170,10 +170,13 @@ public struct AvailabilityFormatter: Sendable {
         }
     }
 
+    /// Time zone abbreviation in the message language (e.g. CET in Dutch/English, MEZ in German),
+    /// so the result doesn't depend on the Mac's own language settings.
     func timeZoneLabel(_ intervals: [DateInterval]) -> String? {
+        let zoneFormatter = formatter("zzz")
         var labels: [String] = []
         for interval in intervals.sorted(by: { $0.start < $1.start }) {
-            let label = timeZone.abbreviation(for: interval.start) ?? timeZone.identifier
+            let label = zoneFormatter.string(from: interval.start)
             if !labels.contains(label) { labels.append(label) }
         }
         return labels.isEmpty ? nil : labels.joined(separator: "/")
